@@ -1,4 +1,5 @@
 import chainlit as cl
+import functools
 import semantic_kernel as sk
 import os
 from typing import Annotated
@@ -23,6 +24,75 @@ AOAI_API_KEY = os.getenv("AOAI_API_KEY")
 AOAI_API_VERSION = os.getenv("AOAI_API_VERSION", "2025-03-01-preview")
 
 
+def prompt_user_confirmation(func):
+    @functools.wraps(func)
+    async def wrapper(*args, **kwargs):
+        res = await cl.AskActionMessage(
+            content=f"Allow execution of `{func.__name__}`?",
+            actions=[
+                cl.Action(name="continue", payload={"value": "continue"}, label="✅ Continue"),
+                cl.Action(name="cancel", payload={"value": "cancel"}, label="❌ Cancel"),
+            ],
+        ).send()
+
+        if res and res.get("payload").get("value") == "continue":
+            return await func(*args, **kwargs)
+        else:
+            return "The plugin execution was cancelled by the user."
+    return wrapper
+
+
+def get_agents(kernel: sk.Kernel) -> list[ChatCompletionAgent]:
+    return [
+        ChatCompletionAgent(
+            kernel=kernel,
+            name="GeneralAgent",
+            instructions="You are a helpful assistant that can answer general questions.",
+        ),
+        ChatCompletionAgent(
+            kernel=kernel,
+            name="FirewallAgent",
+            instructions="You are a helpful assistant that can interact with the Firewall MCP to manage firewall rules.",
+        ),
+    ]
+
+
+class AgentPlugin:
+    def __init__(self, agent: ChatCompletionAgent = None):
+        self.name = agent.name
+        self.agent=agent
+
+    @kernel_function(
+        description="Invoke a subagent to analyze Active Directory.",
+    )
+    async def invoke_agent(self, task: Annotated[str, Field(description="The prompt or task for the subagent.")]) -> str:
+        """
+        Invoke the agent with the given task.
+        """
+        if not self.agent:
+            raise ValueError("Agent is not set.")
+        
+        # get string response
+        response = await self.agent.get_response(
+            task
+        )
+        return str(response.content)
+
+@cl.set_starters
+async def set_starters():
+    return [
+        cl.Starter(
+            label="Identify gaps in my firewall",
+            message="Analyze my current Windows Firewall configuration and identify potential gaps or vulnerabilities.",
+            icon="/public/icons/FluentShieldGlobe24Filled.svg"
+        ),
+        cl.Starter(
+            label="Review my AD domain for risky users",
+            message="Find risky users and roles in my Active Directory domain that could lead to security issues.",
+            icon="/public/icons/FluentPersonQuestionMark24Filled.svg"
+        )
+    ]
+
 @cl.on_chat_start
 async def on_chat_start():
     kernel = sk.Kernel()
@@ -46,7 +116,7 @@ async def on_chat_start():
         kernel.add_plugin(mcp_plugin, plugin_name="ActiveDirectoryAndServicesMCP")
     except Exception as e:
         print(e)
-        await cl.Message(content="Failed to connect to ActiveDirectoryAndServices MCP plugin.").send()
+        # await cl.Message(content="Failed to connect to ActiveDirectoryAndServices MCP plugin.").send()
 
     ai_agent = ChatCompletionAgent(kernel=kernel, instructions="""
 You are an expert in security hardening and system administration regarding Active Directory and Windows systems.
