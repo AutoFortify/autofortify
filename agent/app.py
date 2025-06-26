@@ -121,12 +121,12 @@ async def on_chat_start():
     # Add Bloodhound MCP plugin
     try:
         bloodhound_mcp_plugin = MCPSsePlugin(
-            name="ADEnumerationBloodhoundMCP",
+            name="BloodhoundMCP",
             description="MCP functionality for Bloodhound Community Edition - provides Active Directory security analysis and graph queries",
             url="http://192.168.56.100:8000/sse",
         )
         await bloodhound_mcp_plugin.connect()
-        kernel.add_plugin(bloodhound_mcp_plugin, plugin_name="ADEnumerationBloodhoundMCP")
+        kernel.add_plugin(bloodhound_mcp_plugin, plugin_name="BloodhoundMCP")
     except Exception as e:
         print(f"Failed to connect to Bloodhound MCP plugin: {e}")
         # await cl.Message(content="Failed to connect to Bloodhound MCP plugin.").send()
