@@ -61,12 +61,6 @@ class AgentPlugin:
 
 @cl.on_chat_start
 async def on_chat_start():
-    mcp_plugin = MCPSsePlugin(
-        name="FirewallMCP",
-        description="A plugin to interact with the Firewall MCP",
-        url="http://localhost:8081/mcp",
-    )
-    await mcp_plugin.connect()
     kernel = sk.Kernel()
 
     ai_service = AzureChatCompletion(
@@ -78,7 +72,18 @@ async def on_chat_start():
 
     kernel.add_service(ai_service)
 
-    kernel.add_plugin(mcp_plugin, plugin_name="FirewallMCP")
+    try:
+        mcp_plugin = MCPSsePlugin(
+            name="FirewallMCP",
+            description="A plugin to interact with the Firewall MCP",
+            url="http://localhost:8081/mcp",
+        )
+        await mcp_plugin.connect()
+        kernel.add_plugin(mcp_plugin, plugin_name="FirewallMCP")
+    except Exception as e:
+        print(e)
+        await cl.Message(content="Failed to connect to Firewall MCP plugin.").send()
+
     kernel.add_plugin(AgentPlugin(
         agent=ChatCompletionAgent(
             name="AdAgent",
