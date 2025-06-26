@@ -44,6 +44,7 @@ def create_firewall_rule(
     if SIMULATE_MODIFICATIONS:
         res = 0
     else:
+        # DISCLAIMER: Yes, we know what command injection is. Don't do this. This was hacked together quickly for demonstration purposes.
         res = os.system(
             "powershell.exe -Command "
             f"New-NetFirewallRule -Name '{rule_name}' -DisplayName '{display_name}' "
@@ -70,6 +71,7 @@ def list_constrained_delegation(
     
     try:
         # Use subprocess to capture the output
+        # DISCLAIMER: Yes, we know what command injection is. Don't do this. This was hacked together quickly for demonstration purposes.
         result = subprocess.run(
             [
                 "powershell.exe", "-Command",
@@ -117,6 +119,7 @@ def remove_constrained_delegation(
     if SIMULATE_MODIFICATIONS:
         res = 0
     else:
+        # DISCLAIMER: Yes, we know what command injection is. Don't do this. This was hacked together quickly for demonstration purposes.
         res = os.system(
             "powershell.exe -Command "
             f"Set-ADUser -Identity '{identity}' -Remove @{{'msDS-AllowedToDelegateTo'='{target}'}}"
@@ -143,6 +146,7 @@ def add_ad_group_member(
     if SIMULATE_MODIFICATIONS:
         res = 0
     else:
+        # DISCLAIMER: Yes, we know what command injection is. Don't do this. This was hacked together quickly for demonstration purposes.
         res = os.system(
             "powershell.exe -Command "
             f"Add-ADGroupMember -Identity '{identity}' -Members '{member}'"
@@ -170,6 +174,7 @@ def remove_ad_group_member(
     if SIMULATE_MODIFICATIONS:
         res = 0
     else:
+        # DISCLAIMER: Yes, we know what command injection is. Don't do this. This was hacked together quickly for demonstration purposes.
         res = os.system(
             "powershell.exe -Command "
             f"Remove-ADGroupMember -Identity '{identity}' -Members '{member}' -Confirm:$false"
@@ -207,6 +212,7 @@ def new_ad_user(
             f'{pw_command}; New-ADUser -Name "{name}" -SamAccountName "{sam_account_name}" '
             f'-AccountPassword $Password -Enabled ${str(enabled).lower()} -ChangePasswordAtLogon $true'
         )
+        # DISCLAIMER: Yes, we know what command injection is. Don't do this. This was hacked together quickly for demonstration purposes.
         res = os.system(f'powershell.exe -Command "{command}"')
     if res == 0:
         return f"AD user '{name}' created successfully."
@@ -226,6 +232,7 @@ def remove_ad_user(
     if SIMULATE_MODIFICATIONS:
         res = 0
     else:
+        # DISCLAIMER: Yes, we know what command injection is. Don't do this. This was hacked together quickly for demonstration purposes.
         res = os.system(
             "powershell.exe -Command "
             f"Remove-ADUser -Identity '{identity}' -Confirm:$false"
@@ -248,6 +255,7 @@ def disable_ad_account(
     if SIMULATE_MODIFICATIONS:
         res = 0
     else:
+        # DISCLAIMER: Yes, we know what command injection is. Don't do this. This was hacked together quickly for demonstration purposes.
         res = os.system(
             "powershell.exe -Command "
             f"Disable-ADAccount -Identity '{identity}'"
@@ -270,6 +278,7 @@ def enable_ad_account(
     if SIMULATE_MODIFICATIONS:
         res = 0
     else:
+        # DISCLAIMER: Yes, we know what command injection is. Don't do this. This was hacked together quickly for demonstration purposes.
         res = os.system(
             "powershell.exe -Command "
             f"Enable-ADAccount -Identity '{identity}'"
@@ -298,6 +307,7 @@ def set_ad_account_password(
             f'{pw_command}; Set-ADAccountPassword -Identity "{identity}" '
             f'-NewPassword $Password -Reset:$true'
         )
+        # DISCLAIMER: Yes, we know what command injection is. Don't do this. This was hacked together quickly for demonstration purposes.
         res = os.system(f'powershell.exe -Command "{command}"')
     if res == 0:
         return f"Password for account '{identity}' has been reset successfully."
@@ -324,6 +334,7 @@ def new_ad_group(
     if SIMULATE_MODIFICATIONS:
         res = 0
     else:
+        # DISCLAIMER: Yes, we know what command injection is. Don't do this. This was hacked together quickly for demonstration purposes.
         res = os.system(
             "powershell.exe -Command "
             f"New-ADGroup -Name '{name}' -GroupScope {group_scope} -GroupCategory {group_category}"
@@ -346,6 +357,7 @@ def remove_ad_group(
     if SIMULATE_MODIFICATIONS:
         res = 0
     else:
+        # DISCLAIMER: Yes, we know what command injection is. Don't do this. This was hacked together quickly for demonstration purposes.
         res = os.system(
             "powershell.exe -Command "
             f"Remove-ADGroup -Identity '{identity}' -Confirm:$false"
