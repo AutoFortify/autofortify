@@ -65,10 +65,7 @@ def list_constrained_delegation(
     identity: Annotated[str, Field(description="Account Identity (e.g., username or samAccountName)")],
 ) -> str:
     print(f"Listing constrained delegation for account: {identity}")
-    if SIMULATE_MODIFICATIONS:
-        return f"Simulated listing of constrained delegation for account '{identity}'."
-    else:
-        res = os.system(
+    res = os.system(
             "powershell.exe -Command "
             f"Get-ADUser -Identity '{identity}' -Properties msDS-AllowedToDelegateTo | "
             "Select-Object -ExpandProperty msDS-AllowedToDelegateTo"
