@@ -1,0 +1,14 @@
+{
+    "mcpServers": {
+        "bloodhound_mcp": {
+            "command": "uv",
+            "args": [
+                "--directory",
+                "C:\\Users\\thoma\\OneDrive\\Documents\\hackathon\\bloodhound_mcp-master",
+                "run",
+                "main.py"
+            ]
+        }
+    }
+}
+  
