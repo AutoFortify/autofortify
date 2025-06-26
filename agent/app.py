@@ -118,15 +118,42 @@ async def on_chat_start():
         print(e)
         # await cl.Message(content="Failed to connect to ActiveDirectoryAndServices MCP plugin.").send()
 
+    # Add Bloodhound MCP plugin
+    try:
+        bloodhound_mcp_plugin = MCPSsePlugin(
+            name="BloodhoundMCP",
+            description="MCP functionality for Bloodhound Community Edition - provides Active Directory security analysis and graph queries",
+            url="http://192.168.56.100:8082/mcp",
+        )
+        await bloodhound_mcp_plugin.connect()
+        kernel.add_plugin(bloodhound_mcp_plugin, plugin_name="BloodhoundMCP")
+    except Exception as e:
+        print(f"Failed to connect to Bloodhound MCP plugin: {e}")
+        # await cl.Message(content="Failed to connect to Bloodhound MCP plugin.").send()
+
     ai_agent = ChatCompletionAgent(kernel=kernel, instructions="""
 You are an expert in security hardening and system administration regarding Active Directory and Windows systems.
                                    
 Users will ask you to perform tasks related to user account management, firewall rules, and system hardening.
 
-You have access to tools to retrieve active directory information, modify user accounts, and manage firewall rules.
+You have access to tools to:
+- Retrieve Active Directory information and modify user accounts
+- Manage firewall rules 
+- Analyze Active Directory security using Bloodhound Community Edition
+- Execute Cypher queries against the Bloodhound graph database
+- Identify attack paths, privileged users, and security vulnerabilities in AD environments
+
+The Bloodhound tools allow you to:
+- Search for users, groups, computers, and other AD objects
+- Find administrative relationships and permissions
+- Identify potential attack paths to high-value targets
+- Analyze certificate services and delegation rights
+- Execute custom Cypher queries for advanced analysis
+
 Before running any commands that will modify the system, you will ask for confirmation from the user.
 You will always provide a summary of the actions you are about to take before executing them.
 Be transparent with reasoning and offer suggestions for hardening the system based on best practices.
+When analyzing security, use Bloodhound data to identify the most critical risks and attack paths.
 """)
 
     runtime = InProcessRuntime()
