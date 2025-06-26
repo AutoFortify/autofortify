@@ -1,0 +1,31 @@
+# Environment files containing secrets
+.env
+.env.*
+
+# Python-specific
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+.venv/
+env/
+.pytest_cache/
+
+
+# my specific files
+my-claude.json
+unimplemented.txt
+bloodhound-swagger.json
+bloodhound-swagger/
+.old/
+htmlcov/
+.coverage
+*.log
+# mac files
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+
