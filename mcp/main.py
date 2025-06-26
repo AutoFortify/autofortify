@@ -65,15 +65,39 @@ def list_constrained_delegation(
     identity: Annotated[str, Field(description="Account Identity (e.g., username or samAccountName)")],
 ) -> str:
     print(f"Listing constrained delegation for account: {identity}")
-    res = os.system(
-            "powershell.exe -Command "
-            f"Get-ADUser -Identity '{identity}' -Properties msDS-AllowedToDelegateTo | "
-            "Select-Object -ExpandProperty msDS-AllowedToDelegateTo"
+    
+    import subprocess
+    try:
+        # Use subprocess to capture the output
+        result = subprocess.run(
+            [
+                "powershell.exe", "-Command",
+                f"Get-ADUser -Identity '{identity}' -Properties msDS-AllowedToDelegateTo | "
+                "Select-Object -ExpandProperty msDS-AllowedToDelegateTo"
+            ],
+            capture_output=True,
+            text=True,
+            check=True
         )
-    if res == 0:
-        return f"Listed constrained delegation for account '{identity}' successfully."
-    else:
-        return f"Failed to list constrained delegation for account '{identity}'. Please check the parameters and try again."
+        
+        # Parse the output
+        output = result.stdout.strip()
+        if output:
+            # Split by newlines and filter out empty lines
+            spns = [line.strip() for line in output.split('\n') if line.strip()]
+            if spns:
+                spn_list = '\n'.join([f"  - {spn}" for spn in spns])
+                return f"Constrained delegation SPNs for account '{identity}':\n{spn_list}"
+            else:
+                return f"No constrained delegation permissions found for account '{identity}'."
+        else:
+            return f"No constrained delegation permissions found for account '{identity}'."
+    
+    except subprocess.CalledProcessError as e:
+        error_msg = e.stderr.strip() if e.stderr else "Unknown error"
+        return f"Failed to list constrained delegation for account '{identity}'. Error: {error_msg}"
+    except Exception as e:
+        return f"Failed to list constrained delegation for account '{identity}'. Error: {str(e)}"
 
 @mcp.tool(
     name="remove_constrained_delegation",
