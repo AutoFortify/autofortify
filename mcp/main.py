@@ -57,6 +57,51 @@ def create_firewall_rule(
 '''
 
 @mcp.tool(
+    name="list_constrained_delegation",
+    description="Lists the 'AllowedToDelegate' permissions for an Active Directory account.",
+    annotations={"title": "List Constrained Delegation"},
+)
+def list_constrained_delegation(
+    identity: Annotated[str, Field(description="Account Identity (e.g., username or samAccountName)")],
+) -> str:
+    print(f"Listing constrained delegation for account: {identity}")
+    res = os.system(
+            "powershell.exe -Command "
+            f"Get-ADUser -Identity '{identity}' -Properties msDS-AllowedToDelegateTo | "
+            "Select-Object -ExpandProperty msDS-AllowedToDelegateTo"
+        )
+    if res == 0:
+        return f"Listed constrained delegation for account '{identity}' successfully."
+    else:
+        return f"Failed to list constrained delegation for account '{identity}'. Please check the parameters and try again."
+
+@mcp.tool(
+    name="remove_constrained_delegation",
+    description="Removes the 'AllowedToDelegate' permission from an Active Directory account.",
+    annotations={"title": "Add AD Group Member"},
+)
+def remove_constrained_delegation(
+    identity: Annotated[str, Field(description="Account Identity (e.g., username or samAccountName)")],
+    target: Annotated[str, Field(description="Target service to remove from delegation (e.g. 'service/hostname' which is the SPN)")],
+) -> str:
+    print(
+        f"Removing constrained delegation for account with parameters:\n"
+        f"Account: {identity}\n"
+        f"Target: {target}"
+    )
+    if SIMULATE_MODIFICATIONS:
+        res = 0
+    else:
+        res = os.system(
+            "powershell.exe -Command "
+            f"Set-ADUser -Identity '{identity}' -Remove @{{'msDS-AllowedToDelegateTo'='{target}'}}"
+        )
+    if res == 0:
+        return f"Removed constrained delegation for account '{identity}' targeting '{target}' successfully."
+    else:
+        return f"Failed to remove constrained delegation for account '{identity}' targeting '{target}'. Please check the parameters and try again."
+
+@mcp.tool(
     name="add_ad_group_member",
     description="Adds a member to an Active Directory group.",
     annotations={"title": "Add AD Group Member"},
