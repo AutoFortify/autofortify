@@ -121,12 +121,12 @@ async def on_chat_start():
     # Add Bloodhound MCP plugin
     try:
         bloodhound_mcp_plugin = MCPSsePlugin(
-            name="BloodhoundMCP",
+            name="ADEnumerationBloodhoundMCP",
             description="MCP functionality for Bloodhound Community Edition - provides Active Directory security analysis and graph queries",
-            url="http://192.168.56.100:8082/mcp",
+            url="http://192.168.56.100:8000/sse",
         )
         await bloodhound_mcp_plugin.connect()
-        kernel.add_plugin(bloodhound_mcp_plugin, plugin_name="BloodhoundMCP")
+        kernel.add_plugin(bloodhound_mcp_plugin, plugin_name="ADEnumerationBloodhoundMCP")
     except Exception as e:
         print(f"Failed to connect to Bloodhound MCP plugin: {e}")
         # await cl.Message(content="Failed to connect to Bloodhound MCP plugin.").send()
@@ -136,24 +136,19 @@ You are an expert in security hardening and system administration regarding Acti
                                    
 Users will ask you to perform tasks related to user account management, firewall rules, and system hardening.
 
-You have access to tools to:
-- Retrieve Active Directory information and modify user accounts
-- Manage firewall rules 
-- Analyze Active Directory security using Bloodhound Community Edition
-- Execute Cypher queries against the Bloodhound graph database
-- Identify attack paths, privileged users, and security vulnerabilities in AD environments
-
-The Bloodhound tools allow you to:
-- Search for users, groups, computers, and other AD objects
-- Find administrative relationships and permissions
-- Identify potential attack paths to high-value targets
-- Analyze certificate services and delegation rights
-- Execute custom Cypher queries for advanced analysis
-
 Before running any commands that will modify the system, you will ask for confirmation from the user.
 You will always provide a summary of the actions you are about to take before executing them.
 Be transparent with reasoning and offer suggestions for hardening the system based on best practices.
-When analyzing security, use Bloodhound data to identify the most critical risks and attack paths.
+When analyzing active directory security, use Bloodhound data to identify the most critical risks and attack paths.
+
+- When running the Bloodhound tools, attempt to use the existing, specific functions provided by the plugin for finding attack paths. 
+- Do NOT ask for user approval before running any bloodhound queries. 
+- Avoid using custom Cypher queries unless existing functions cannot achieve the desired result or they are defined in the example queries function from the MCP
+- Do NOT use API endpoints that are not provided by the MCP plugin.
+- If a user asks to find attack paths from all users to high value targets, use "Domain Admins" as the target unless otherwise specified and use the get_users function to get all starting nodes.
+- If unsure about a users request, ask for clarification or provide a general overview of the available options before proceeding
+                                                           
+Use markdown format for headings, bold text, lists, and code blocks to enhance readability.
 """)
 
     runtime = InProcessRuntime()

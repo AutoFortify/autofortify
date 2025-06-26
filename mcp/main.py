@@ -3,12 +3,64 @@ from typing import Annotated, Literal
 from pydantic import Field
 import os
 import subprocess
+import json
+import re
 
 
 SIMULATE_MODIFICATIONS = True
 
 mcp = FastMCP()
 
+
+@mcp.tool(
+    name="list_inbound_firewall_rules",
+    description="Lists all inbound firewall rules that are enabled and allow traffic. Returns a JSON array of objects with properties: 'Rule Name', 'Grouping', 'LocalPort', and 'Protocol'.",
+    annotations={"title": "List Inbound Firewall Rules"},
+)
+def list_inbound_firewall_rules() -> str:
+    try:
+        out_bytes = subprocess.check_output(
+            "netsh advfirewall firewall show rule name=all", shell=True
+        )
+        out_str = out_bytes.decode("utf-8").replace("Ok.", "")
+        temp = [k for x in re.split(r"\n\s*\n", out_str) if (k := x.strip())]
+        rule_lines = [
+            {
+                z[0].strip(): z[1].strip()
+                for k in x.split("\n")
+                if (y := k.strip())
+                and not y.startswith("------")
+                and len(z := y.split(": ", 1)) == 2
+            }
+            for x in temp
+        ]
+
+        filtered_rules = [
+            rule
+            for rule in rule_lines
+            if rule.get("Enabled", "") == "Yes"
+            and rule.get("Direction", "") == "In"
+            and rule.get("Action", "") == "Allow"
+        ]
+
+        filtered_rules = [
+            rule
+            for rule in filtered_rules
+            if not (
+                (rname := rule.get("Rule Name", "")).startswith("@")
+                or rname.startswith("{")
+                or (rgroup := rule.get("Grouping", "")).startswith("@")
+                or rgroup.startswith("{")
+            )
+        ]
+
+        target_properties = ["Rule Name", "Grouping", "LocalPort", "Protocol"]
+        final_rules = [
+            {k: v for k, v in rule.items() if k in target_properties} for rule in filtered_rules
+        ]
+        return json.dumps(final_rules)
+    except Exception as e:
+        return f"Failed to list inbound firewall rules."
 
 @mcp.tool(
     name="create_firewall_rule",
