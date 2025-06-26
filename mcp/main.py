@@ -2,6 +2,8 @@ from fastmcp.server import FastMCP
 from typing import Annotated, Literal
 from pydantic import Field
 import os
+import subprocess
+
 
 SIMULATE_MODIFICATIONS = True
 
@@ -66,7 +68,6 @@ def list_constrained_delegation(
 ) -> str:
     print(f"Listing constrained delegation for account: {identity}")
     
-    import subprocess
     try:
         # Use subprocess to capture the output
         result = subprocess.run(
