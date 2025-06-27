@@ -1,4 +1,9 @@
-# AutoFortify
+<picture align=center>
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/AutoFortify/autofortify/refs/heads/thomas-dev/agent/public/logo_dark.png" algin=center alt="A blue copilot logo">
+  <img  src="https://raw.githubusercontent.com/AutoFortify/autofortify/refs/heads/thomas-dev/agent/public/logo_light.png" align=center>
+</picture>
+
+# Auto**Fortify**
 
 AutoFortify is a suite of Model Context Protocol (MCP) tools that empowers IT administrators to secure Windows devices and services using natural language.
 
@@ -11,8 +16,8 @@ AutoFortify is a suite of Model Context Protocol (MCP) tools that empowers IT ad
 - **MCP Tools**: Extensible architecture using Model Context Protocol
   - Windows Firewall
   - Active Directory (requires Windows Server AD DC)
-  - [Bloodhound](https://github.com/mwnickerson/bloodhound_mcp)
-
+  - [Bloodhound](https://github.com/mwnickerson/bloodhound_mcp) (with additional capabilities)
+ 
 ## Quick Start
 
 ### Prerequisites
@@ -74,8 +79,6 @@ autofortify/
 ## Architecture
 
 The MCP servers are built using the [FastMCP](https://github.com/jlowin/fastmcp) library. We also implement an MCP client and agent using [Semantic Kernel](https://github.com/microsoft/semantic-kernel), while [Chainlit](https://github.com/Chainlit/chainlit) provides the frontend for the agent.
-
-![Architecture Diagram](./docs/hackathon_architecture.png)
 
 ## Disclaimer
 
