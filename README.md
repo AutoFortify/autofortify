@@ -16,8 +16,8 @@ AutoFortify is a suite of Model Context Protocol (MCP) tools that empowers IT ad
 - **MCP Tools**: Extensible architecture using Model Context Protocol
   - Windows Firewall
   - Active Directory (requires Windows Server AD DC)
-  - [Bloodhound](https://github.com/mwnickerson/bloodhound_mcp)
-
+  - [Bloodhound](https://github.com/mwnickerson/bloodhound_mcp) (with additional capabilities)
+ 
 ## Quick Start
 
 ### Prerequisites
