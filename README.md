@@ -5,7 +5,11 @@
   </picture>
 </div>
 
-<p></p>
+<p>
+
+
+
+</p>
 
 AutoFortify is a suite of Model Context Protocol (MCP) tools that empowers IT administrators to secure Windows devices and services using natural language.
 
