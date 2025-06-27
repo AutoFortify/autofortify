@@ -1,5 +1,5 @@
 <picture align=center>
-  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/AutoFortify/autofortify/refs/heads/thomas-dev/agent/public/logo_dark.png" algin=center>
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/AutoFortify/autofortify/refs/heads/thomas-dev/agent/public/logo_dark.png" algin=center alt="A blue copilot logo">
   <img  src="https://raw.githubusercontent.com/AutoFortify/autofortify/refs/heads/thomas-dev/agent/public/logo_light.png" align=center>
 </picture>
 
