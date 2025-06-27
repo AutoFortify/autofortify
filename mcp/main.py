@@ -63,7 +63,6 @@ def list_inbound_firewall_rules() -> str:
     except Exception as e:
         return f"Failed to list inbound firewall rules."
 
-
 @mcp.tool(
     name="create_firewall_rule",
     description="Creates and enables a firewall rule with the specified parameters.",
