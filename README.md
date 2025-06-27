@@ -64,6 +64,12 @@ AutoFortify is a suite of Model Context Protocol (MCP) tools that empowers IT ad
    chainlit run app.py -w -h
    ```
 
+## Architecture
+
+The MCP servers are built using the [FastMCP](https://github.com/jlowin/fastmcp) library. We also implement an MCP client and agent using [Semantic Kernel](https://github.com/microsoft/semantic-kernel), while [Chainlit](https://github.com/Chainlit/chainlit) provides the frontend for the agent.
+
+![Architecture Diagram](./docs/arch_diagram.png)
+
 ## Project Structure
 
 ```
@@ -75,10 +81,6 @@ autofortify/
     └── bloodhound/       # BloodHound MCP server
 
 ```
-
-## Architecture
-
-The MCP servers are built using the [FastMCP](https://github.com/jlowin/fastmcp) library. We also implement an MCP client and agent using [Semantic Kernel](https://github.com/microsoft/semantic-kernel), while [Chainlit](https://github.com/Chainlit/chainlit) provides the frontend for the agent.
 
 ## Disclaimer
 
