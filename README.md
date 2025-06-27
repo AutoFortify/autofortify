@@ -1,9 +1,9 @@
-# AutoFortify
-
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/AutoFortify/autofortify/refs/heads/thomas-dev/agent/public/logo_dark.png">
-  <img  src="https://raw.githubusercontent.com/AutoFortify/autofortify/refs/heads/thomas-dev/agent/public/logo_light.png">
-</picture>
+<center>
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/AutoFortify/autofortify/refs/heads/thomas-dev/agent/public/logo_dark.png">
+    <img  src="https://raw.githubusercontent.com/AutoFortify/autofortify/refs/heads/thomas-dev/agent/public/logo_light.png">
+  </picture>
+</center>
 
 AutoFortify is a suite of Model Context Protocol (MCP) tools that empowers IT administrators to secure Windows devices and services using natural language.
 
