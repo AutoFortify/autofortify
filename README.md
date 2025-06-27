@@ -5,6 +5,8 @@
   </picture>
 </div>
 
+<p></p>
+
 AutoFortify is a suite of Model Context Protocol (MCP) tools that empowers IT administrators to secure Windows devices and services using natural language.
 
 ![AutoFortify prompt](./docs/autofortify-prompt.png)
