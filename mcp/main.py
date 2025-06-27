@@ -7,7 +7,7 @@ import json
 import re
 
 
-SIMULATE_MODIFICATIONS = True
+SIMULATE_MODIFICATIONS = False
 
 mcp = FastMCP()
 
