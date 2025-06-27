@@ -100,7 +100,7 @@ async def on_chat_start():
     ai_service = AzureChatCompletion(
         endpoint=AOAI_ENDPOINT_URI,
         api_key=AOAI_API_KEY,
-        deployment_name="o4-mini",
+        deployment_name="gpt-4.1",
         api_version=AOAI_API_VERSION,
     )
 
@@ -120,20 +120,21 @@ async def on_chat_start():
 
     # Add Bloodhound MCP plugin
     try:
-        bloodhound_mcp_plugin = MCPSsePlugin(
-            name="ADEnumerationBloodhoundMCP",
-            description="MCP functionality for Bloodhound Community Edition - provides Active Directory security analysis and graph queries",
-            url="http://192.168.56.100:8000/sse",
-        )
-        await bloodhound_mcp_plugin.connect()
-        kernel.add_plugin(bloodhound_mcp_plugin, plugin_name="ADEnumerationBloodhoundMCP")
+        # bloodhound_mcp_plugin = MCPSsePlugin(
+        #     name="ADEnumerationBloodhoundMCP",
+        #     description="MCP functionality for Bloodhound Community Edition - provides Active Directory security analysis and graph queries",
+        #     url="http://192.168.56.100:8000/sse",
+        # )
+        # await bloodhound_mcp_plugin.connect()
+        # kernel.add_plugin(bloodhound_mcp_plugin, plugin_name="ADEnumerationBloodhoundMCP")
+        pass
     except Exception as e:
         print(f"Failed to connect to Bloodhound MCP plugin: {e}")
         # await cl.Message(content="Failed to connect to Bloodhound MCP plugin.").send()
 
     ai_agent = ChatCompletionAgent(kernel=kernel, instructions="""
 You are an expert in security hardening and system administration regarding Active Directory and Windows systems.
-                                   
+
 Users will ask you to perform tasks related to user account management, firewall rules, and system hardening.
 
 Before running any commands that will modify the system, you will ask for confirmation from the user.
@@ -147,7 +148,8 @@ When analyzing active directory security, use Bloodhound data to identify the mo
 - Do NOT use API endpoints that are not provided by the MCP plugin.
 - If a user asks to find attack paths from all users to high value targets, use "Domain Admins" as the target unless otherwise specified and use the get_users function to get all starting nodes.
 - If unsure about a users request, ask for clarification or provide a general overview of the available options before proceeding
-                                                           
+- When performing remediation actions on users, utilize the job descriptions as context to determine whether or not the user requires access to the resource. Provide this reasoning to the user.
+
 Use markdown format for headings, bold text, lists, and code blocks to enhance readability.
 """)
 

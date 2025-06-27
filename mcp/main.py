@@ -56,11 +56,13 @@ def list_inbound_firewall_rules() -> str:
 
         target_properties = ["Rule Name", "Grouping", "LocalPort", "Protocol"]
         final_rules = [
-            {k: v for k, v in rule.items() if k in target_properties} for rule in filtered_rules
+            {k: v for k, v in rule.items() if k in target_properties}
+            for rule in filtered_rules
         ]
         return json.dumps(final_rules)
     except Exception as e:
         return f"Failed to list inbound firewall rules."
+
 
 @mcp.tool(
     name="create_firewall_rule",
@@ -107,9 +109,51 @@ def create_firewall_rule(
     else:
         return f"Failed to create firewall rule '{rule_name}'. Please check the parameters and try again."
 
-'''
+
+@mcp.tool(
+    name="disable_firewall_rule",
+    description="Disables a firewall rule with the specified name.",
+    annotations={"title": "Disable Firewall Rule"},
+)
+def disable_firewall_rule(
+    rule_name: Annotated[
+        str, Field(description="Name of the firewall rule to disable")
+    ],
+) -> str:
+    print(f"Disabling firewall rule with name: {rule_name}")
+    if SIMULATE_MODIFICATIONS:
+        res = 0
+    else:
+        # DISCLAIMER: Yes, we know what command injection is. Don't do this. This was hacked together quickly for demonstration purposes.
+        res = os.system(
+            "powershell.exe -Command "
+            f"Set-NetFirewallRule -Name '{rule_name}' -Enabled False"
+        )
+    if res == 0:
+        return f"Firewall rule '{rule_name}' disabled successfully."
+    else:
+        return f"Failed to disable firewall rule '{rule_name}'. Please check the parameters and try again."
+
+
+@mcp.tool(
+    name="get_job_descriptions",
+    description="Returns a description of the available tools and their usage.",
+    annotations={"title": "Get Job Descriptions"},
+)
+def get_job_descriptions() -> str:
+    try:
+        with open("context/job_descriptions.txt", "r") as file:
+            descriptions = file.read()
+
+        return descriptions
+    except Exception:
+        return "Failed to retrieve job descriptions."
+
+
+"""
 ## ACTIVE DIRECTORY TOOLS
-'''
+"""
+
 
 @mcp.tool(
     name="list_constrained_delegation",
@@ -117,42 +161,50 @@ def create_firewall_rule(
     annotations={"title": "List Constrained Delegation"},
 )
 def list_constrained_delegation(
-    identity: Annotated[str, Field(description="Account Identity (e.g., username or samAccountName)")],
+    identity: Annotated[
+        str, Field(description="Account Identity (e.g., username or samAccountName)")
+    ],
 ) -> str:
     print(f"Listing constrained delegation for account: {identity}")
-    
+
     try:
         # Use subprocess to capture the output
         # DISCLAIMER: Yes, we know what command injection is. Don't do this. This was hacked together quickly for demonstration purposes.
         result = subprocess.run(
             [
-                "powershell.exe", "-Command",
+                "powershell.exe",
+                "-Command",
                 f"Get-ADUser -Identity '{identity}' -Properties msDS-AllowedToDelegateTo | "
-                "Select-Object -ExpandProperty msDS-AllowedToDelegateTo"
+                "Select-Object -ExpandProperty msDS-AllowedToDelegateTo",
             ],
             capture_output=True,
             text=True,
-            check=True
+            check=True,
         )
-        
+
         # Parse the output
         output = result.stdout.strip()
         if output:
             # Split by newlines and filter out empty lines
-            spns = [line.strip() for line in output.split('\n') if line.strip()]
+            spns = [line.strip() for line in output.split("\n") if line.strip()]
             if spns:
-                spn_list = '\n'.join([f"  - {spn}" for spn in spns])
-                return f"Constrained delegation SPNs for account '{identity}':\n{spn_list}"
+                spn_list = "\n".join([f"  - {spn}" for spn in spns])
+                return (
+                    f"Constrained delegation SPNs for account '{identity}':\n{spn_list}"
+                )
             else:
                 return f"No constrained delegation permissions found for account '{identity}'."
         else:
-            return f"No constrained delegation permissions found for account '{identity}'."
-    
+            return (
+                f"No constrained delegation permissions found for account '{identity}'."
+            )
+
     except subprocess.CalledProcessError as e:
         error_msg = e.stderr.strip() if e.stderr else "Unknown error"
         return f"Failed to list constrained delegation for account '{identity}'. Error: {error_msg}"
     except Exception as e:
         return f"Failed to list constrained delegation for account '{identity}'. Error: {str(e)}"
+
 
 @mcp.tool(
     name="remove_constrained_delegation",
@@ -160,8 +212,15 @@ def list_constrained_delegation(
     annotations={"title": "Add AD Group Member"},
 )
 def remove_constrained_delegation(
-    identity: Annotated[str, Field(description="Account Identity (e.g., username or samAccountName)")],
-    target: Annotated[str, Field(description="Target service to remove from delegation (e.g. 'service/hostname' which is the SPN)")],
+    identity: Annotated[
+        str, Field(description="Account Identity (e.g., username or samAccountName)")
+    ],
+    target: Annotated[
+        str,
+        Field(
+            description="Target service to remove from delegation (e.g. 'service/hostname' which is the SPN)"
+        ),
+    ],
 ) -> str:
     print(
         f"Removing constrained delegation for account with parameters:\n"
@@ -181,6 +240,7 @@ def remove_constrained_delegation(
     else:
         return f"Failed to remove constrained delegation for account '{identity}' targeting '{target}'. Please check the parameters and try again."
 
+
 @mcp.tool(
     name="add_ad_group_member",
     description="Adds a member to an Active Directory group.",
@@ -188,7 +248,9 @@ def remove_constrained_delegation(
 )
 def add_ad_group_member(
     identity: Annotated[str, Field(description="Group Identity (e.g., group name)")],
-    member: Annotated[str, Field(description="Member Identity to add (e.g., username)")],
+    member: Annotated[
+        str, Field(description="Member Identity to add (e.g., username)")
+    ],
 ) -> str:
     print(
         f"Adding member to AD group with parameters:\n"
@@ -216,7 +278,9 @@ def add_ad_group_member(
 )
 def remove_ad_group_member(
     identity: Annotated[str, Field(description="Group Identity (e.g., group name)")],
-    member: Annotated[str, Field(description="Member Identity to remove (e.g., username)")],
+    member: Annotated[
+        str, Field(description="Member Identity to remove (e.g., username)")
+    ],
 ) -> str:
     print(
         f"Removing member from AD group with parameters:\n"
@@ -244,9 +308,21 @@ def remove_ad_group_member(
 )
 def new_ad_user(
     name: Annotated[str, Field(description="User's full name (e.g., 'John Smith')")],
-    sam_account_name: Annotated[str, Field(description="User's logon name (pre-Windows 2000)")],
-    password: Annotated[str, Field(description="The user's initial password. This will be set as an expired password, forcing the user to change it on next logon.")],
-    enabled: Annotated[bool, Field(description="Whether the account should be enabled or disabled upon creation.")] = True,
+    sam_account_name: Annotated[
+        str, Field(description="User's logon name (pre-Windows 2000)")
+    ],
+    password: Annotated[
+        str,
+        Field(
+            description="The user's initial password. This will be set as an expired password, forcing the user to change it on next logon."
+        ),
+    ],
+    enabled: Annotated[
+        bool,
+        Field(
+            description="Whether the account should be enabled or disabled upon creation."
+        ),
+    ] = True,
 ) -> str:
     print(
         f"Creating new AD user with parameters:\n"
@@ -262,7 +338,7 @@ def new_ad_user(
         pw_command = f'$Password = ConvertTo-SecureString -String \\"{password}\\" -AsPlainText -Force'
         command = (
             f'{pw_command}; New-ADUser -Name "{name}" -SamAccountName "{sam_account_name}" '
-            f'-AccountPassword $Password -Enabled ${str(enabled).lower()} -ChangePasswordAtLogon $true'
+            f"-AccountPassword $Password -Enabled ${str(enabled).lower()} -ChangePasswordAtLogon $true"
         )
         # DISCLAIMER: Yes, we know what command injection is. Don't do this. This was hacked together quickly for demonstration purposes.
         res = os.system(f'powershell.exe -Command "{command}"')
@@ -278,7 +354,9 @@ def new_ad_user(
     annotations={"title": "Remove AD User"},
 )
 def remove_ad_user(
-    identity: Annotated[str, Field(description="User Identity (e.g., username or distinguished name)")],
+    identity: Annotated[
+        str, Field(description="User Identity (e.g., username or distinguished name)")
+    ],
 ) -> str:
     print(f"Removing AD user with identity: {identity}")
     if SIMULATE_MODIFICATIONS:
@@ -309,8 +387,7 @@ def disable_ad_account(
     else:
         # DISCLAIMER: Yes, we know what command injection is. Don't do this. This was hacked together quickly for demonstration purposes.
         res = os.system(
-            "powershell.exe -Command "
-            f"Disable-ADAccount -Identity '{identity}'"
+            "powershell.exe -Command " f"Disable-ADAccount -Identity '{identity}'"
         )
     if res == 0:
         return f"Disabled account '{identity}' successfully."
@@ -332,8 +409,7 @@ def enable_ad_account(
     else:
         # DISCLAIMER: Yes, we know what command injection is. Don't do this. This was hacked together quickly for demonstration purposes.
         res = os.system(
-            "powershell.exe -Command "
-            f"Enable-ADAccount -Identity '{identity}'"
+            "powershell.exe -Command " f"Enable-ADAccount -Identity '{identity}'"
         )
     if res == 0:
         return f"Enabled account '{identity}' successfully."
@@ -348,7 +424,9 @@ def enable_ad_account(
 )
 def set_ad_account_password(
     identity: Annotated[str, Field(description="Account Identity (e.g., username)")],
-    new_password: Annotated[str, Field(description="The new password for the account.")],
+    new_password: Annotated[
+        str, Field(description="The new password for the account.")
+    ],
 ) -> str:
     print(f"Resetting password for AD account: {identity}")
     if SIMULATE_MODIFICATIONS:
@@ -357,7 +435,7 @@ def set_ad_account_password(
         pw_command = f'$Password = ConvertTo-SecureString -String \\"{new_password}\\" -AsPlainText -Force'
         command = (
             f'{pw_command}; Set-ADAccountPassword -Identity "{identity}" '
-            f'-NewPassword $Password -Reset:$true'
+            f"-NewPassword $Password -Reset:$true"
         )
         # DISCLAIMER: Yes, we know what command injection is. Don't do this. This was hacked together quickly for demonstration purposes.
         res = os.system(f'powershell.exe -Command "{command}"')
@@ -374,8 +452,13 @@ def set_ad_account_password(
 )
 def new_ad_group(
     name: Annotated[str, Field(description="Name for the new group")],
-    group_scope: Annotated[Literal["DomainLocal", "Global", "Universal"], Field(description="Scope of the group")],
-    group_category: Annotated[Literal["Security", "Distribution"], Field(description="Category of the group")] = "Security",
+    group_scope: Annotated[
+        Literal["DomainLocal", "Global", "Universal"],
+        Field(description="Scope of the group"),
+    ],
+    group_category: Annotated[
+        Literal["Security", "Distribution"], Field(description="Category of the group")
+    ] = "Security",
 ) -> str:
     print(
         f"Creating new AD group with parameters:\n"
@@ -418,8 +501,6 @@ def remove_ad_group(
         return f"Removed group '{identity}' successfully."
     else:
         return f"Failed to remove group '{identity}'. Please check the parameters and try again."
-
-
 
 
 if __name__ == "__main__":
