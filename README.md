@@ -80,8 +80,6 @@ autofortify/
 
 The MCP servers are built using the [FastMCP](https://github.com/jlowin/fastmcp) library. We also implement an MCP client and agent using [Semantic Kernel](https://github.com/microsoft/semantic-kernel), while [Chainlit](https://github.com/Chainlit/chainlit) provides the frontend for the agent.
 
-![Architecture Diagram](./docs/hackathon_architecture.png)
-
 ## Disclaimer
 
 > [!CAUTION]  
