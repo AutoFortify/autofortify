@@ -1,4 +1,4 @@
-﻿# AutoFortify
+# AutoFortify
 
 AutoFortify is a suite of Model Context Protocol (MCP) tools that empowers IT administrators to secure Windows devices and services using natural language.
 
@@ -26,7 +26,7 @@ AutoFortify is a suite of Model Context Protocol (MCP) tools that empowers IT ad
 
 1. **Clone the repository**
    ```powershell
-   git clone <repository-url>
+   git clone https://github.com/AutoFortify/autofortify.git
    cd autofortify
    ```
 
